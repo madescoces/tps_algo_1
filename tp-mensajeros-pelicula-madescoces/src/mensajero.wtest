@@ -1,0 +1,140 @@
+import mensajeros.*
+import mensajerias.*
+import vehiculos.*
+import paquetes.*
+import destinos.*
+
+describe "Vehiculos"{
+	test "Camión puede agregar/quitar acoplados, si agrega 1 su peso es 1000, por defecto es 500"{
+		var pesoInicial = camion.peso()
+		
+		camion.addAcoplado()
+		assert.equals(pesoInicial + 500,camion.peso())
+		camion.removeAcoplado()
+		assert.equals(pesoInicial,camion.peso())
+	}
+	
+	test "Camioneta puede agregar/quitar paquetes y su peso varia si esta llena o no"{
+		var pesoInicial = camioneta.peso()
+		assert.equals(450,camioneta.peso())
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		assert.that(camioneta.llena())
+		assert.equals(900,camioneta.peso())
+	}
+}
+
+describe "Roberto"{
+	test "Roberto de 90kg puede llevar un paquete pago en un camión con acoplado" {
+		roberto.peso(90)
+		paquete.pagar()
+		roberto.vehiculo(camion)
+		assert.that(paquete.puedeSerEntregadoPor(roberto))
+	}
+	
+	test "Roberto no puede pasar por puente de Brooklyn si viaja en camión y tiene 2 acoplados"{
+		camion.addAcoplado()
+		roberto.vehiculo(camion)
+		assert.notThat(paquete.puedeSerEntregadoPor(roberto))
+	}
+	
+	
+}
+
+describe "Neo"{
+	test "Neo con crédito no puede llevar un paquete impago"{
+		neo.credito(20)
+		assert.notThat(paquete.puedeSerEntregadoPor(neo))
+	}
+}
+
+describe "Porcel"{
+	test "Porcel es muy pesado y el puente no lo deja pasar si la camioneta esta llena"{
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		camioneta.addPaquete(paquete)
+		assert.notThat(paquete.puedeSerEntregadoPor(porcel))
+	}
+	
+	test "Porcel puede entrar al infierno"{
+		paquete.destino(infierno)
+		paquete.pagar()
+		assert.that(paquete.puedeSerEntregadoPor(porcel))
+	}
+}
+
+describe "Mensajeria"{
+	
+	test "Remover solo si existe, y sin duplicados"{
+		mensajeria.contratarMensajero(neo)
+		mensajeria.contratarMensajero(neo)
+		mensajeria.contratarMensajero(chuck)
+		mensajeria.despedirMensajero(roberto)
+		assert.equals([neo,chuck], mensajeria.mensajeros())
+		mensajeria.despedirMensajero(neo)
+		assert.equals([chuck], mensajeria.mensajeros())
+	}	
+	
+	test "Remover todos" {
+		mensajeria.contratarMensajero(neo)
+		mensajeria.contratarMensajero(chuck)
+		mensajeria.despedirTodos()
+		assert.equals([],mensajeria.mensajeros())
+	}
+	
+	test "Mensajería es grande si tiene + de dos mensajeros" {
+		mensajeria.contratarMensajero(neo)
+		mensajeria.contratarMensajero(chuck)
+		assert.notThat(mensajeria.mensajeriaEsGrande())
+		mensajeria.contratarMensajero(roberto)
+		assert.that(mensajeria.mensajeriaEsGrande())
+	}
+	
+	test "Mensajería puede informar el peso del último mensajero"{
+		mensajeria.contratarMensajero(neo)
+		mensajeria.contratarMensajero(roberto)
+		mensajeria.contratarMensajero(chuck)
+		assert.equals(900,mensajeria.ultimoMensajeroPesa())
+	}
+	
+	test "Mensajería puede informar si el paquete puede ser entregado por el primero"{
+		mensajeria.contratarMensajero(roberto)
+		mensajeria.contratarMensajero(neo)
+		mensajeria.contratarMensajero(chuck)
+		assert.notThat(mensajeria.primeroPuedeEntregar())
+		paquete.pagar()
+		assert.tcc hat(mensajeria.primeroPuedeEntregar())
+	}
+}
+
+describe "Mensajeria recargada"{
+	
+	test "Paquetito es gratis"{
+		assert.that(paquetito.pagado())
+	}
+	
+	test "Paquetón es multidestino, agregando por cada uno 100$ al envio"{
+		paqueton.agregarDestino(matrix)
+		paqueton.agregarDestino(puenteBrooklyn)
+		assert.equals(200,paqueton.precio())
+		paqueton.pagoParcial(100)
+		assert.notThat(paqueton.pagado())
+		paqueton.pagoParcial(100)
+		assert.that(paqueton.pagado())
+	}
+}
